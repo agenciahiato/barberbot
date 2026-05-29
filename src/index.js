@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const { initSchema } = require('./db');
 const webhookRouter = require('./routes/webhook');
 const flowRouter = require('./routes/flow');
+const adminRouter = require('./routes/admin');
 const reminders = require('./jobs/reminders');
 
 initSchema();
@@ -17,6 +18,7 @@ const app = express();
 // El router de Flow ya usa express.text(), no apliques JSON aquí globalmente.
 app.use('/flow', flowRouter);
 app.use(bodyParser.json({ limit: '1mb' }));
+app.use('/', adminRouter);
 app.use('/', webhookRouter);
 
 app.get('/healthz', (_req, res) => res.send('ok'));
