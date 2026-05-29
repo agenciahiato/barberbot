@@ -1,0 +1,212 @@
+{
+  "version": "5.0",
+  "data_api_version": "3.0",
+  "routing_model": {
+    "SERVICE": ["DATE"],
+    "DATE": ["SLOT"],
+    "SLOT": ["SUMMARY"],
+    "SUMMARY": []
+  },
+  "screens": [
+    {
+      "id": "SERVICE",
+      "title": "Elige el servicio",
+      "terminal": false,
+      "data": {
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" }
+            }
+          },
+          "__example__": [
+            { "id": "1", "title": "Corte de pelo · 30 min · 15 €" }
+          ]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "form_service",
+            "children": [
+              {
+                "type": "RadioButtonsGroup",
+                "label": "¿Qué quieres hacerte?",
+                "name": "service_id",
+                "data-source": "${data.services}",
+                "required": true
+              },
+              {
+                "type": "Footer",
+                "label": "Continuar",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "screen": "SERVICE",
+                    "service_id": "${form.service_id}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "DATE",
+      "title": "Elige el día",
+      "terminal": false,
+      "data": {
+        "service_id": { "type": "string", "__example__": "1" },
+        "dates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" }
+            }
+          },
+          "__example__": [{ "id": "2026-05-30", "title": "Sábado 30 mayo" }]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "form_date",
+            "children": [
+              {
+                "type": "Dropdown",
+                "label": "Día de la cita",
+                "name": "date",
+                "data-source": "${data.dates}",
+                "required": true
+              },
+              {
+                "type": "Footer",
+                "label": "Ver horarios",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "screen": "DATE",
+                    "service_id": "${data.service_id}",
+                    "date": "${form.date}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SLOT",
+      "title": "Elige la hora",
+      "terminal": false,
+      "data": {
+        "service_id": { "type": "string", "__example__": "1" },
+        "date": { "type": "string", "__example__": "2026-05-30" },
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" }
+            }
+          },
+          "__example__": [{ "id": "10:00", "title": "10:00" }]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "form_slot",
+            "children": [
+              {
+                "type": "RadioButtonsGroup",
+                "label": "Horas disponibles",
+                "name": "slot",
+                "data-source": "${data.slots}",
+                "required": true
+              },
+              {
+                "type": "Footer",
+                "label": "Revisar reserva",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "screen": "SLOT",
+                    "service_id": "${data.service_id}",
+                    "date": "${data.date}",
+                    "slot": "${form.slot}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SUMMARY",
+      "title": "Confirma tu cita",
+      "terminal": true,
+      "data": {
+        "service_id": { "type": "string", "__example__": "1" },
+        "service_title": { "type": "string", "__example__": "Corte de pelo" },
+        "date": { "type": "string", "__example__": "2026-05-30" },
+        "date_title": { "type": "string", "__example__": "Sábado 30 mayo" },
+        "slot": { "type": "string", "__example__": "10:00" }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "Resumen"
+          },
+          {
+            "type": "TextBody",
+            "text": "Servicio: ${data.service_title}\nDía: ${data.date_title}\nHora: ${data.slot}"
+          },
+          {
+            "type": "Form",
+            "name": "form_confirm",
+            "children": [
+              {
+                "type": "TextInput",
+                "label": "Tu nombre",
+                "name": "name",
+                "required": true
+              },
+              {
+                "type": "Footer",
+                "label": "Confirmar cita",
+                "on-click-action": {
+                  "name": "complete",
+                  "payload": {
+                    "service_id": "${data.service_id}",
+                    "service_title": "${data.service_title}",
+                    "date": "${data.date}",
+                    "slot": "${data.slot}",
+                    "name": "${form.name}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
